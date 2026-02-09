@@ -4,8 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Users, Plus, X, ChevronRight, User, Phone } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { auth } from '../firebase';
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 const FamilyHealth = () => {
     const { user } = useContext(AuthContext);

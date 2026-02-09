@@ -40,27 +40,46 @@ class FirestoreService {
         if (!this.db) throw new Error("Firestore not initialized");
         const normalized = FirestoreService.normalizePhone(phone);
 
-        console.log(`[DB] Searching for user with phone: ${phone} (Normalized: ${normalized})`);
+        console.log(`[DB] Searching for user: ${phone} (Normalized: ${normalized})`);
 
+        // 1. Try normalized search (Fast)
         const snapshot = await this.db.collection('users')
             .where('phone_normalized', '==', normalized)
             .limit(1)
             .get();
 
         if (!snapshot.empty) {
-            const doc = snapshot.docs[0];
-            return { id: doc.id, ...doc.data() };
+            return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
         }
 
-        // Fallback to legacy phone field (though we should migrate)
+        // 2. Legacy Fallback: Try exact match
         const snapshotLegacy = await this.db.collection('users')
             .where('phone', '==', phone)
             .limit(1)
             .get();
 
-        if (snapshotLegacy.empty) return null;
-        const docLegacy = snapshotLegacy.docs[0];
-        return { id: docLegacy.id, ...docLegacy.data() };
+        if (!snapshotLegacy.empty) {
+            return { id: snapshotLegacy.docs[0].id, ...snapshotLegacy.docs[0].data() };
+        }
+
+        // 3. Last Resort: Fetch all users (only if DB is small) or search for variations
+        // For now, let's try searching common Indian prefixes if missing
+        const variations = [
+            phone,
+            `+91${phone}`,
+            `+91 ${phone}`,
+            phone.startsWith('+91') ? phone.slice(3) : phone
+        ];
+
+        for (const variant of variations) {
+            const snap = await this.db.collection('users')
+                .where('phone', '==', variant)
+                .limit(1)
+                .get();
+            if (!snap.empty) return { id: snap.docs[0].id, ...snap.docs[0].data() };
+        }
+
+        return null;
     }
 
     async updateUser(userId, data) {

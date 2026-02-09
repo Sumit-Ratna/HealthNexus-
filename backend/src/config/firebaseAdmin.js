@@ -35,6 +35,12 @@ try {
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccount)
         });
+
+        // Enable ignoreUndefinedProperties
+        admin.firestore().settings({
+            ignoreUndefinedProperties: true
+        });
+
         console.log("[FIREBASE] Admin SDK initialized successfully");
     } else if (!serviceAccount) {
         throw new Error("No service account credentials found (Env Var or File)");
