@@ -13,11 +13,12 @@ const ScanQR = () => {
 
     const handleSearch = async () => {
         if (!manualId) return;
+        const searchId = manualId.toUpperCase().trim();
         setStatus('searching');
         setMessage('');
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/connect/doctor/qr/${manualId}`, {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/connect/doctor/qr/${searchId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setDoctorData(res.data);

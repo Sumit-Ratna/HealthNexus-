@@ -4,11 +4,12 @@ const firestoreService = require('../services/firestoreService');
 exports.getDoctorDetails = async (req, res) => {
     try {
         const { qr_id } = req.params;
+        const searchId = qr_id.toUpperCase().trim();
         const patient_id = req.user.id;
 
         // Find doctor by QR ID
         const snapshot = await firestoreService.db.collection('users')
-            .where('doctor_qr_id', '==', qr_id)
+            .where('doctor_qr_id', '==', searchId)
             .where('role', '==', 'doctor')
             .limit(1)
             .get();
@@ -47,11 +48,12 @@ exports.getDoctorDetails = async (req, res) => {
 exports.connectToDoctor = async (req, res) => {
     try {
         const { doctor_qr_id } = req.body;
+        const searchId = doctor_qr_id.toUpperCase().trim();
         const patient_id = req.user.id;
 
         // Find doctor
         const snapshot = await firestoreService.db.collection('users')
-            .where('doctor_qr_id', '==', doctor_qr_id)
+            .where('doctor_qr_id', '==', searchId)
             .where('role', '==', 'doctor')
             .limit(1)
             .get();

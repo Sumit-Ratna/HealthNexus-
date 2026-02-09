@@ -231,10 +231,17 @@ exports.refreshToken = async (req, res) => {
 // Get current user
 exports.getMe = async (req, res) => {
     try {
-        const user = await firestoreService.getUser(req.user.id);
+        let user = await firestoreService.getUser(req.user.id);
 
         if (!user) {
             return res.status(404).json({ error: "User not found" });
+        }
+
+        // Auto-generate QR ID if missing for doctor
+        if (user.role === 'doctor' && !user.doctor_qr_id) {
+            const newQrId = 'DOC-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            await firestoreService.updateUser(user.id, { doctor_qr_id: newQrId });
+            user = await firestoreService.getUser(user.id);
         }
 
         const safeUser = { ...user };
