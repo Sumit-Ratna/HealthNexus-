@@ -37,108 +37,17 @@ const FamilyHealth = () => {
         }
     };
 
-    const setupRecaptcha = (elementId) => {
-        // 1. Clear existing verifier session
-        if (window.recaptchaVerifier) {
-            try {
-                window.recaptchaVerifier.clear();
-            } catch (e) {
-                console.warn("Recaptcha clear error:", e);
-            }
-            window.recaptchaVerifier = null;
-        }
-
-        // 2. Clear visual DOM artifacts
-        const container = document.getElementById(elementId);
-        if (container) {
-            container.innerHTML = '';
-        }
-
-        // 3. Init new verifier
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, elementId, {
-            'size': 'invisible',
-            'callback': () => console.log("Recaptcha Verified")
-        });
-    };
-
     const handleInitiate = async (e) => {
         e.preventDefault();
         setError('');
         setLoading(true);
 
         try {
-            // 1. Tell backend to prepare the link (and check if user exists)
+            // 1. Tell backend to connect the link directly (OTP Bypassed)
             const token = localStorage.getItem('accessToken');
             await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/family/add`, {
                 phone: newMemberPhone,
                 relation: relation
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            // 2. Init Firebase Auth
-            // Use a specific ID for family add modal
-            setupRecaptcha('recaptcha-family-add');
-            const appVerifier = window.recaptchaVerifier;
-
-            let formattedPhone = newMemberPhone;
-            if (!formattedPhone.startsWith('+')) {
-                formattedPhone = '+91' + formattedPhone;
-            }
-
-            console.log("Sending OTP to:", formattedPhone);
-
-            const confirmation = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
-            setConfirmationResult(confirmation);
-
-            setStep('otp');
-
-        } catch (err) {
-            console.error("Full Family Add Error:", err);
-
-            let errMsg;
-            if (err.response && err.response.data && err.response.data.error) {
-                // Backend sent a specific error (e.g., "User not found", "Already connected")
-                errMsg = err.response.data.error;
-            } else if (err.code && err.code.startsWith('auth/')) {
-                // Real Firebase Error
-                errMsg = `Firebase: ${err.code}`;
-            } else {
-                // Network or other error
-                errMsg = err.message || 'Failed to send OTP';
-            }
-
-            setError(errMsg);
-            // alert("Error: " + errMsg); // Optional
-
-            if (window.recaptchaVerifier) {
-                try { window.recaptchaVerifier.clear(); } catch (e) { }
-                window.recaptchaVerifier = null;
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleVerify = async (e) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
-
-        try {
-            // 1. Verify with Firebase
-            if (!confirmationResult) throw new Error("No OTP session found");
-            const result = await confirmationResult.confirm(otp);
-            const user = result.user;
-            const idToken = await user.getIdToken();
-
-            console.log("Firebase Auth Success. Token:", idToken);
-
-            // 2. Send Token to Backend to finalize link
-            const token = localStorage.getItem('accessToken');
-            await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/family/verify`, {
-                phone: newMemberPhone,
-                firebaseToken: idToken
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -148,8 +57,8 @@ const FamilyHealth = () => {
             alert('Family member connected successfully!');
 
         } catch (err) {
-            console.error(err);
-            const errMsg = err.code ? `Firebase: ${err.code}` : (err.message || 'Verification failed');
+            console.error("Full Family Add Error:", err);
+            const errMsg = err.response?.data?.error || err.message || 'Failed to connect member';
             setError(errMsg);
         } finally {
             setLoading(false);
@@ -158,16 +67,9 @@ const FamilyHealth = () => {
 
     const closeModal = () => {
         setShowAddModal(false);
-        setStep('phone');
         setNewMemberPhone('');
-        setOtp('');
         setRelation('Family');
         setError('');
-        setConfirmationResult(null);
-        if (window.recaptchaVerifier) {
-            try { window.recaptchaVerifier.clear(); } catch (e) { }
-            window.recaptchaVerifier = null;
-        }
     };
 
     const handleRemoveMember = async (memberId) => {
@@ -304,66 +206,42 @@ const FamilyHealth = () => {
                                 </button>
                             </div>
 
-                            <form onSubmit={step === 'phone' ? handleInitiate : handleVerify}>
-                                {step === 'phone' ? (
-                                    <>
-                                        <div style={{ marginBottom: '16px' }}>
-                                            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#8E8E93', marginBottom: '6px' }}>
-                                                PHONE NUMBER
-                                            </label>
-                                            <input
-                                                type="tel"
-                                                placeholder="Enter their registered phone"
-                                                value={newMemberPhone}
-                                                onChange={(e) => setNewMemberPhone(e.target.value)}
-                                                required
-                                                style={{ width: '100%', padding: '12px', fontSize: '16px', borderRadius: '8px', border: '1px solid #E5E5EA' }}
-                                            />
-                                            <p style={{ fontSize: '11px', color: '#8E8E93', marginTop: '4px' }}>
-                                                Note: The family member must already have an account on HealthNexus.
-                                            </p>
-                                        </div>
-                                        <div style={{ marginBottom: '24px' }}>
-                                            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#8E8E93', marginBottom: '6px' }}>
-                                                RELATIONSHIP
-                                            </label>
-                                            <select
-                                                value={relation}
-                                                onChange={(e) => setRelation(e.target.value)}
-                                                style={{ width: '100%', padding: '12px', fontSize: '16px', borderRadius: '8px', border: '1px solid #E5E5EA' }}
-                                            >
-                                                <option value="Family">Family</option>
-                                                <option value="Mother">Mother</option>
-                                                <option value="Father">Father</option>
-                                                <option value="Spouse">Spouse</option>
-                                                <option value="Son">Son</option>
-                                                <option value="Daughter">Daughter</option>
-                                                <option value="Sibling">Sibling</option>
-                                                <option value="Other">Other</option>
-                                            </select>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div style={{ marginBottom: '24px' }}>
-                                        <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#8E8E93', marginBottom: '6px' }}>
-                                            ENTER OTP
-                                        </label>
-                                        <input
-                                            type="text"
-                                            placeholder="Enter 6-digit code"
-                                            value={otp}
-                                            onChange={(e) => setOtp(e.target.value)}
-                                            required
-                                            style={{ width: '100%', padding: '12px', fontSize: '18px', textAlign: 'center', letterSpacing: '2px', borderRadius: '8px', border: '1px solid #E5E5EA' }}
-                                        />
-                                        <p style={{ fontSize: '13px', color: '#34C759', marginTop: '8px', textAlign: 'center' }}>
-                                            We sent a verification code to {newMemberPhone}
-                                        </p>
-                                    </div>
-                                )}
-
-                                {/* Keep Recaptcha Container Always Rendered */}
-                                <div id="recaptcha-family-add"></div>
+                            <form onSubmit={handleInitiate}>
+                                <div style={{ marginBottom: '16px' }}>
+                                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#8E8E93', marginBottom: '6px' }}>
+                                        PHONE NUMBER
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        placeholder="Enter their registered phone"
+                                        value={newMemberPhone}
+                                        onChange={(e) => setNewMemberPhone(e.target.value)}
+                                        required
+                                        style={{ width: '100%', padding: '12px', fontSize: '16px', borderRadius: '8px', border: '1px solid #E5E5EA' }}
+                                    />
+                                    <p style={{ fontSize: '11px', color: '#8E8E93', marginTop: '4px' }}>
+                                        Note: The family member must already have an account on HealthNexus.
+                                    </p>
+                                </div>
+                                <div style={{ marginBottom: '24px' }}>
+                                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#8E8E93', marginBottom: '6px' }}>
+                                        RELATIONSHIP
+                                    </label>
+                                    <select
+                                        value={relation}
+                                        onChange={(e) => setRelation(e.target.value)}
+                                        style={{ width: '100%', padding: '12px', fontSize: '16px', borderRadius: '8px', border: '1px solid #E5E5EA' }}
+                                    >
+                                        <option value="Family">Family</option>
+                                        <option value="Mother">Mother</option>
+                                        <option value="Father">Father</option>
+                                        <option value="Spouse">Spouse</option>
+                                        <option value="Son">Son</option>
+                                        <option value="Daughter">Daughter</option>
+                                        <option value="Sibling">Sibling</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
 
                                 {error && (
                                     <div style={{ color: '#FF3B30', fontSize: '13px', marginBottom: '16px', background: '#FFF0F0', padding: '10px', borderRadius: '8px' }}>
@@ -377,14 +255,13 @@ const FamilyHealth = () => {
                                     disabled={loading}
                                     style={{ width: '100%', padding: '14px', fontSize: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                                 >
-                                    {loading ? 'Processing...' : (step === 'phone' ? 'Send OTP' : 'Verify & Connect')}
+                                    {loading ? 'Processing...' : 'Connect Member'}
                                 </button>
                             </form>
                         </motion.div>
                     </div>
                 )}
             </AnimatePresence>
-            <div id="recaptcha-container"></div>
         </div>
     );
 };

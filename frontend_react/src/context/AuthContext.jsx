@@ -2,9 +2,6 @@ import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-import { auth } from '../firebase';
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
-
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -48,16 +45,12 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // -> Recaptcha Removed for Fixed OTP Flow
-
     const sendOtp = async (phone) => {
         try {
-            // 1. Direct Login Request (Backend handles token generation if user exists)
             const res = await axios.post(`https://healthnexus-c3sa.onrender.com/api/auth/otp/send`, { phone });
             const { isNew, accessToken, user } = res.data;
 
             if (accessToken && user) {
-                console.log(`[AUTH] Direct Login Success for ${phone}`);
                 localStorage.setItem('accessToken', accessToken);
                 axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
                 setUser(user);
@@ -71,29 +64,7 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const verifyOtp = async (confirmationResult_ignored, otp, phone, expectedRole = 'patient') => {
-        // 1. Skip Firebase Verification
-
-        // 2. Login with Backend using Fixed OTP - Hardcoded URL for reliability
-        const res = await axios.post(`https://healthnexus-c3sa.onrender.com/api/auth/otp/verify`, {
-            phone,
-            otp, // Sending OTP instead of firebaseToken
-            role: expectedRole
-        });
-
-        const { accessToken, user } = res.data;
-
-        localStorage.setItem('accessToken', accessToken);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-        setUser(user);
-
-        return user;
-    };
-
-    const register = async (userData, firebaseToken_ignored) => {
-        // userData: { phone, role, name, etc. }
-        // We inject otp '123456' to bypass backend check
-        // hardcoded URL for reliability
+    const register = async (userData) => {
         const res = await axios.post(`https://healthnexus-c3sa.onrender.com/api/auth/register`, {
             ...userData,
             otp: '123456'
@@ -108,7 +79,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const deleteAccount = async () => {
-        await axios.delete(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/profile/delete`);
+        await axios.delete(`https://healthnexus-c3sa.onrender.com/api/profile/delete`);
         logout();
     };
 
@@ -120,7 +91,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, sendOtp, verifyOtp, register, logout, deleteAccount, fetchUser }}>
+        <AuthContext.Provider value={{ user, loading, sendOtp, register, logout, deleteAccount, fetchUser }}>
             {children}
         </AuthContext.Provider>
     );
