@@ -38,11 +38,12 @@ class FirestoreService {
 
     async getUserByPhone(phone) {
         if (!this.db) throw new Error("Firestore not initialized");
+        if (!phone) return null;
+
         const normalized = FirestoreService.normalizePhone(phone);
+        console.log(`[DB] Searching for user: "${phone}" (Normalized: ${normalized})`);
 
-        console.log(`[DB] Searching for user: ${phone} (Normalized: ${normalized})`);
-
-        // 1. Try normalized search (Fast)
+        // 1. Try normalized search (Fastest, uses index)
         const snapshot = await this.db.collection('users')
             .where('phone_normalized', '==', normalized)
             .limit(1)
@@ -52,31 +53,26 @@ class FirestoreService {
             return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
         }
 
-        // 2. Legacy Fallback: Try exact match
-        const snapshotLegacy = await this.db.collection('users')
-            .where('phone', '==', phone)
-            .limit(1)
-            .get();
-
-        if (!snapshotLegacy.empty) {
-            return { id: snapshotLegacy.docs[0].id, ...snapshotLegacy.docs[0].data() };
-        }
-
-        // 3. Last Resort: Fetch all users (only if DB is small) or search for variations
-        // For now, let's try searching common Indian prefixes if missing
+        // 2. Fallback: Search variations in 'phone' field (Legacy)
         const variations = [
-            phone,
-            `+91${phone}`,
-            `+91 ${phone}`,
-            phone.startsWith('+91') ? phone.slice(3) : phone
-        ];
+            normalized,
+            phone.trim(),
+            `+91${normalized}`,
+            `+91 ${normalized}`,
+            phone.includes('+91') ? phone : `+91 ${phone}`
+        ].filter(v => v);
 
         for (const variant of variations) {
             const snap = await this.db.collection('users')
                 .where('phone', '==', variant)
                 .limit(1)
                 .get();
-            if (!snap.empty) return { id: snap.docs[0].id, ...snap.docs[0].data() };
+            if (!snap.empty) {
+                const user = { id: snap.docs[0].id, ...snap.docs[0].data() };
+                // Auto-migrate on discovery
+                await this.updateUser(user.id, { phone_normalized: normalized });
+                return user;
+            }
         }
 
         return null;

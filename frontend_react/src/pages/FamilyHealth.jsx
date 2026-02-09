@@ -41,10 +41,15 @@ const FamilyHealth = () => {
         setLoading(true);
 
         try {
+            const cleanPhone = newMemberPhone.trim();
+            if (!cleanPhone) throw new Error("Phone number is required");
+
             // 1. Tell backend to connect the link directly (OTP Bypassed)
             const token = localStorage.getItem('accessToken');
-            await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/family/add`, {
-                phone: newMemberPhone,
+            const baseUrl = import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com';
+
+            await axios.post(`${baseUrl}/api/family/add`, {
+                phone: cleanPhone,
                 relation: relation
             }, {
                 headers: { Authorization: `Bearer ${token}` }

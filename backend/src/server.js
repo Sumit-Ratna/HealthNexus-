@@ -45,6 +45,20 @@ if (db) {
     console.warn('[WARNING] Firestore not initialized. Add service-account.json to enable database.');
 }
 
+// 404 Handler
+app.use((req, res) => {
+    res.status(404).json({ error: "Route not found" });
+});
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error(`[ERROR] ${req.method} ${req.url}:`, err.stack);
+    res.status(err.status || 500).json({
+        error: err.message || "Internal Server Error",
+        details: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+});
+
 app.listen(PORT, () => {
     console.log(`[SERVER] Running on port ${PORT}`);
     console.log(`[DATABASE] Firebase Firestore`);

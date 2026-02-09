@@ -50,8 +50,5 @@ try {
 }
 
 const db = admin.apps.length ? admin.firestore() : null;
-if (db) {
-    db.settings({ ignoreUndefinedProperties: true });
-}
 
 module.exports = { admin, db };

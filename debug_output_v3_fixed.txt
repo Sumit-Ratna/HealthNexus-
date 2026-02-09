@@ -1,0 +1,9 @@
+[FIREBASE] Loading credentials from local file
+[FIREBASE] Admin SDK initialized successfully
+DOCTORS IN DB:
+- ID: a929c529-7250-47cc-bdfa-28b8e7c9e70f, Name: khushi, QR: DOC-8GQG3I, Phone: +91 1234567890
+
+ALL USERS (LIMIT 10):
+- ID: 12aba346-3110-4f82-ae90-3fd6ed9e2c0d, Name: sumit, Phone: +91 1234567899, Normalized: 1234567899, Role: patient
+- ID: a929c529-7250-47cc-bdfa-28b8e7c9e70f, Name: khushi, Phone: +91 1234567890, Normalized: 1234567890, Role: doctor
+- ID: e6a03162-4c00-4485-9e44-5dddd9db1ea7, Name: adi, Phone: +91 6205904440, Normalized: undefined, Role: patient

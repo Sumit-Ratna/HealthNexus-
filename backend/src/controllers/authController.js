@@ -240,8 +240,10 @@ exports.getMe = async (req, res) => {
         // Auto-migrate: Add phone_normalized if missing
         if (!user.phone_normalized && user.phone) {
             const normalized = firestoreService.constructor.normalizePhone(user.phone);
-            await firestoreService.updateUser(user.id, { phone_normalized: normalized });
-            user.phone_normalized = normalized;
+            if (normalized) {
+                await firestoreService.updateUser(user.id, { phone_normalized: normalized });
+                user.phone_normalized = normalized;
+            }
         }
 
         // Auto-generate QR ID if missing for doctor
