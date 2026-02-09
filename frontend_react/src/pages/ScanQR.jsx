@@ -18,24 +18,34 @@ const ScanQR = () => {
         setMessage('');
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/connect/doctor/qr/${searchId}`, {
-                headers: { Authorization: `Bearer ${token}` }
+            const baseUrl = import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com';
+            const url = `${baseUrl}/api/connect/doctor/qr/${searchId}`;
+
+            console.log(`[DEBUG] SEARCHING: ${url}`);
+            const res = await axios.get(url, {
+                headers: token ? { Authorization: `Bearer ${token}` } : {},
+                timeout: 30000 // 30s for Render spin-up
             });
             setDoctorData(res.data);
-            console.log("SEARCH RESPONSE:", res.data);
             setStatus('found');
         } catch (err) {
-            console.error("Search Error:", err);
+            console.error("Search Error Details:", err);
 
-            if (err.response?.data?.error === 'Invalid Token' || err.response?.status === 401) {
+            if (err.response?.status === 401) {
                 alert("Session expired. Please login again.");
                 localStorage.removeItem('accessToken');
-                window.location.href = '/login';
+                window.location.href = '/login/patient';
                 return;
             }
 
             setStatus('error');
-            setMessage(err.response?.data?.error || "Doctor not found");
+            if (err.code === 'ECONNABORTED') {
+                setMessage("Server is taking too long to respond. It might be waking up. Please try FIND again in 10 seconds.");
+            } else if (!err.response) {
+                setMessage("Network Connection Error. Cannot reach server. Please check your internet or try again.");
+            } else {
+                setMessage(err.response.data?.error || "Doctor not found. Please check the ID.");
+            }
         }
     };
 

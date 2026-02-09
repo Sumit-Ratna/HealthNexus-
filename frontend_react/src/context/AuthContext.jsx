@@ -32,9 +32,11 @@ export const AuthProvider = ({ children }) => {
         return () => axios.interceptors.response.eject(interceptor);
     }, []);
 
+    const baseUrl = import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com';
+
     const fetchUser = async () => {
         try {
-            const res = await axios.get(`https://healthnexus-c3sa.onrender.com/api/auth/me`);
+            const res = await axios.get(`${baseUrl}/api/auth/me`, { timeout: 10000 });
             setUser(res.data);
         } catch (err) {
             console.error("Auth Check Failed", err);
@@ -47,7 +49,7 @@ export const AuthProvider = ({ children }) => {
 
     const sendOtp = async (phone) => {
         try {
-            const res = await axios.post(`https://healthnexus-c3sa.onrender.com/api/auth/otp/send`, { phone });
+            const res = await axios.post(`${baseUrl}/api/auth/otp/send`, { phone }, { timeout: 10000 });
             const { isNew, accessToken, user } = res.data;
 
             if (accessToken && user) {
@@ -65,10 +67,10 @@ export const AuthProvider = ({ children }) => {
     };
 
     const register = async (userData) => {
-        const res = await axios.post(`https://healthnexus-c3sa.onrender.com/api/auth/register`, {
+        const res = await axios.post(`${baseUrl}/api/auth/register`, {
             ...userData,
             otp: '123456'
-        });
+        }, { timeout: 10000 });
         const { accessToken, user } = res.data;
 
         localStorage.setItem('accessToken', accessToken);
@@ -79,7 +81,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const deleteAccount = async () => {
-        await axios.delete(`https://healthnexus-c3sa.onrender.com/api/profile/delete`);
+        await axios.delete(`${baseUrl}/api/profile/delete`, { timeout: 10000 });
         logout();
     };
 

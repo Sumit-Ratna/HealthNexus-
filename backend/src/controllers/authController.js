@@ -237,8 +237,9 @@ exports.getMe = async (req, res) => {
             return res.status(404).json({ error: "User not found" });
         }
 
-        // Auto-migrate: Add phone_normalized if missing
-        if (!user.phone_normalized && user.phone) {
+        // Auto-migrate: Add phone_normalized if missing or "undefined"
+        const isCorrupted = !user.phone_normalized || user.phone_normalized === 'undefined';
+        if (isCorrupted && user.phone) {
             const normalized = firestoreService.constructor.normalizePhone(user.phone);
             if (normalized) {
                 await firestoreService.updateUser(user.id, { phone_normalized: normalized });

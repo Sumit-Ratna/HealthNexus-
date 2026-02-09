@@ -281,7 +281,7 @@ const Signup = () => {
                         <div style={{ marginTop: '24px', textAlign: 'center', fontSize: '14px', color: 'var(--text-secondary)' }}>
                             Already have an account?{' '}
                             <span
-                                onClick={() => navigate('/login')}
+                                onClick={() => navigate('/login/patient')}
                                 style={{ color: 'var(--primary-color)', fontWeight: 600, cursor: 'pointer' }}
                             >
                                 Log in

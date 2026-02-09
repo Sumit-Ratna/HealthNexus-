@@ -45,7 +45,8 @@ const Records = ({ viewingPatientId }) => {
     const fetchConnectedDoctors = async () => {
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/connect/patient/doctors`, {
+            const baseUrl = import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com';
+            const res = await axios.get(`${baseUrl}/api/connect/patient/doctors`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setConnectedDoctors(res.data);
@@ -57,12 +58,16 @@ const Records = ({ viewingPatientId }) => {
     const fetchDocuments = async () => {
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/documents/patient/${targetUserId}`, {
+            const baseUrl = import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com';
+            const res = await axios.get(`${baseUrl}/api/documents/patient/${targetUserId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setDocuments(res.data);
         } catch (err) {
             console.error("Fetch docs error", err);
+            if (!err.response) {
+                setError("Network error fetching records. Click to retry.");
+            }
         }
     };
 

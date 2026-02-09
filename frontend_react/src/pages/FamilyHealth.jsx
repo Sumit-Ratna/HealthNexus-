@@ -44,15 +44,17 @@ const FamilyHealth = () => {
             const cleanPhone = newMemberPhone.trim();
             if (!cleanPhone) throw new Error("Phone number is required");
 
-            // 1. Tell backend to connect the link directly (OTP Bypassed)
             const token = localStorage.getItem('accessToken');
             const baseUrl = import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com';
+
+            console.log(`[DEBUG] ADDING FAMILY: ${baseUrl}/api/family/add`);
 
             await axios.post(`${baseUrl}/api/family/add`, {
                 phone: cleanPhone,
                 relation: relation
             }, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: token ? { Authorization: `Bearer ${token}` } : {},
+                timeout: 30000 // 30s for Render spin-up
             });
 
             fetchFamilyMembers();
@@ -60,8 +62,17 @@ const FamilyHealth = () => {
             alert('Family member connected successfully!');
 
         } catch (err) {
-            console.error("Full Family Add Error:", err);
-            const errMsg = err.response?.data?.error || err.message || 'Failed to connect member';
+            console.error("Family Add Error Details:", err);
+            let errMsg = 'Failed to connect member';
+
+            if (err.code === 'ECONNABORTED') {
+                errMsg = "Server timeout. Render might be waking up. Please try again in 10s.";
+            } else if (!err.response) {
+                errMsg = "Network Error: Cannot reach server. Please check your internet connection.";
+            } else {
+                errMsg = err.response.data?.error || err.message || 'Failed to connect member';
+            }
+
             setError(errMsg);
         } finally {
             setLoading(false);

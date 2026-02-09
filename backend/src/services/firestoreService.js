@@ -41,9 +41,9 @@ class FirestoreService {
         if (!phone) return null;
 
         const normalized = FirestoreService.normalizePhone(phone);
-        console.log(`[DB] Searching for user: "${phone}" (Normalized: ${normalized})`);
+        console.log(`[DB] SEARCH: "${phone}" -> [${normalized}]`);
 
-        // 1. Try normalized search (Fastest, uses index)
+        // 1. Fast search on normalized field
         const snapshot = await this.db.collection('users')
             .where('phone_normalized', '==', normalized)
             .limit(1)
