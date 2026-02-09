@@ -52,17 +52,21 @@ export const AuthProvider = ({ children }) => {
 
     const sendOtp = async (phone) => {
         try {
-            // 1. Check User Status with Backend - Hardcoded URL for reliability
+            // 1. Direct Login Request (Backend handles token generation if user exists)
             const res = await axios.post(`https://healthnexus-c3sa.onrender.com/api/auth/otp/send`, { phone });
-            const { isNew } = res.data;
+            const { isNew, accessToken, user } = res.data;
 
-            console.log(`[DEV] Fixed OTP Mode. User exists: ${!isNew}`);
-            // In a real app, backend would send SMS here. 
-            // For now, we assume user knows '123456'.
+            if (accessToken && user) {
+                console.log(`[AUTH] Direct Login Success for ${phone}`);
+                localStorage.setItem('accessToken', accessToken);
+                axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+                setUser(user);
+                return { isNew: false, success: true };
+            }
 
-            return { isNew };
+            return { isNew: isNew || true, success: false };
         } catch (err) {
-            console.error("OTP Send Error:", err);
+            console.error("Direct Login/Check Error:", err);
             throw err;
         }
     };

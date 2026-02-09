@@ -21,17 +21,40 @@ const generateTokens = (user) => {
     return { accessToken, refreshToken };
 };
 
-// Check User Existence
+// Check User Existence & Direct Login
 exports.sendOtp = async (req, res) => {
-    const { phone } = req.body;
-    console.log(`[PHONE] Check User Request: ${phone}`);
+    const { phone, role = 'patient' } = req.body;
+    console.log(`[AUTH] Direct Login/Check Request: ${phone}`);
 
     try {
         const user = await firestoreService.getUserByPhone(phone);
-        const isNew = !user;
-        res.json({ message: "User status checked", isNew });
+
+        if (user) {
+            console.log(`[AUTH] User found. Generating tokens for direct login.`);
+            const tokens = generateTokens(user);
+
+            // Update refresh token
+            await firestoreService.updateUser(user.id, {
+                refresh_token: tokens.refreshToken
+            });
+
+            // Prepare safe user object
+            const safeUser = { ...user };
+            delete safeUser.refresh_token;
+
+            return res.json({
+                message: "Direct Login Successful",
+                isNew: false,
+                accessToken: tokens.accessToken,
+                refreshToken: tokens.refreshToken,
+                user: safeUser
+            });
+        }
+
+        // For new users, return isNew: true so frontend can show signup
+        res.json({ message: "User not found", isNew: true });
     } catch (err) {
-        console.error("Check User Error:", err);
+        console.error("Direct Login Error:", err);
         res.status(500).json({ error: err.message });
     }
 };
