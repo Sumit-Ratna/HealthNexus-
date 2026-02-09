@@ -9,15 +9,24 @@ class FirestoreService {
         this.db = db;
     }
 
+    // Helper to normalize phone numbers (keep last 10 digits)
+    static normalizePhone(phone) {
+        if (!phone) return '';
+        const digits = phone.replace(/\D/g, '');
+        return digits.length >= 10 ? digits.slice(-10) : digits;
+    }
+
     // === USER OPERATIONS ===
     async createUser(userId, userData) {
         if (!this.db) throw new Error("Firestore not initialized");
+        const phone_normalized = FirestoreService.normalizePhone(userData.phone);
         await this.db.collection('users').doc(userId).set({
             ...userData,
+            phone_normalized,
             createdAt: new Date(),
             updatedAt: new Date()
         });
-        return { id: userId, ...userData };
+        return { id: userId, ...userData, phone_normalized };
     }
 
     async getUser(userId) {
@@ -29,22 +38,38 @@ class FirestoreService {
 
     async getUserByPhone(phone) {
         if (!this.db) throw new Error("Firestore not initialized");
+        const normalized = FirestoreService.normalizePhone(phone);
+
+        console.log(`[DB] Searching for user with phone: ${phone} (Normalized: ${normalized})`);
+
         const snapshot = await this.db.collection('users')
+            .where('phone_normalized', '==', normalized)
+            .limit(1)
+            .get();
+
+        if (!snapshot.empty) {
+            const doc = snapshot.docs[0];
+            return { id: doc.id, ...doc.data() };
+        }
+
+        // Fallback to legacy phone field (though we should migrate)
+        const snapshotLegacy = await this.db.collection('users')
             .where('phone', '==', phone)
             .limit(1)
             .get();
 
-        if (snapshot.empty) return null;
-        const doc = snapshot.docs[0];
-        return { id: doc.id, ...doc.data() };
+        if (snapshotLegacy.empty) return null;
+        const docLegacy = snapshotLegacy.docs[0];
+        return { id: docLegacy.id, ...docLegacy.data() };
     }
 
     async updateUser(userId, data) {
         if (!this.db) throw new Error("Firestore not initialized");
-        await this.db.collection('users').doc(userId).update({
-            ...data,
-            updatedAt: new Date()
-        });
+        const updates = { ...data, updatedAt: new Date() };
+        if (data.phone) {
+            updates.phone_normalized = FirestoreService.normalizePhone(data.phone);
+        }
+        await this.db.collection('users').doc(userId).update(updates);
         return this.getUser(userId);
     }
 

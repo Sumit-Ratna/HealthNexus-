@@ -237,11 +237,18 @@ exports.getMe = async (req, res) => {
             return res.status(404).json({ error: "User not found" });
         }
 
+        // Auto-migrate: Add phone_normalized if missing
+        if (!user.phone_normalized && user.phone) {
+            const normalized = firestoreService.constructor.normalizePhone(user.phone);
+            await firestoreService.updateUser(user.id, { phone_normalized: normalized });
+            user.phone_normalized = normalized;
+        }
+
         // Auto-generate QR ID if missing for doctor
         if (user.role === 'doctor' && !user.doctor_qr_id) {
             const newQrId = 'DOC-' + Math.random().toString(36).substr(2, 6).toUpperCase();
             await firestoreService.updateUser(user.id, { doctor_qr_id: newQrId });
-            user = await firestoreService.getUser(user.id);
+            user.doctor_qr_id = newQrId;
         }
 
         const safeUser = { ...user };

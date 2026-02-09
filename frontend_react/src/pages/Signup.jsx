@@ -16,7 +16,7 @@ const Signup = () => {
     const [step, setStep] = useState(1);
     const [role, setRole] = useState(initialRole);
     const [formData, setFormData] = useState({
-        phone: '',
+        phone: location.state?.phone || '',
         otp: '',
         name: '',
         dob: '',

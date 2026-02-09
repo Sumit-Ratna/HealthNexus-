@@ -24,9 +24,8 @@ const Login = () => {
                 // User logged in directly
                 navigate('/home');
             } else if (isNew) {
-                // User doesn't exist, redirect to signup/profile setup
-                setIsNewUser(true);
-                navigate('/profile-setup');
+                // User doesn't exist, redirect to signup
+                navigate('/signup', { state: { phone: phoneNumber } });
             }
         } catch (err) {
             console.error("Login Error Details:", err);
