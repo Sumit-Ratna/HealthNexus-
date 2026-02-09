@@ -20,8 +20,11 @@ exports.initiateFamilyLink = async (req, res) => {
             return res.status(400).json({ error: "Cannot add yourself." });
         }
 
-        // Check if already connected
-        const existingLink = await firestoreService.getFamilyLink(userId, member.id);
+        // Check if already connected (Check both directions)
+        let existingLink = await firestoreService.getFamilyLink(userId, member.id);
+        if (!existingLink) {
+            existingLink = await firestoreService.getFamilyLink(member.id, userId);
+        }
 
         if (existingLink) {
             console.log(`[WARNING] Existing link found: Status ${existingLink.status}`);
