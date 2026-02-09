@@ -15,6 +15,7 @@ const Login = () => {
     const [confirmationResult, setConfirmationResult] = useState(null);
 
     const handleSend = async () => {
+        const targetUrl = "https://healthnexus-c3sa.onrender.com/api/auth/otp/send";
         try {
             if (!phoneNumber) {
                 alert("Please enter a phone number");
@@ -30,8 +31,9 @@ const Login = () => {
             // Auto-fill OTP for convenience
             setOtp('123456');
         } catch (err) {
-            console.error("Login Error:", err);
-            alert("Failed to connect: " + err.message);
+            console.error("Login Error Details:", err);
+            const detail = err.response ? `Status: ${err.response.status}` : (err.request ? "No response from server (Check CORS/SSL)" : err.message);
+            alert(`CONNECTION FAILED!\nTarget: ${targetUrl}\nIssue: ${detail}\n\nTIP: Check if your computer date/time is correct! (Current: 2026)`);
         }
     };
 
