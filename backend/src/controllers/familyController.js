@@ -43,17 +43,18 @@ exports.initiateFamilyLink = async (req, res) => {
             }
         }
 
-        // Create new pending link
+        // Create new active link directly (OTP Bypassed)
         const newLink = await firestoreService.createFamilyLink({
             user_id: userId,
             family_member_id: member.id,
             relation: relation || 'family',
-            status: 'pending'
+            status: 'active', // Changed from pending
+            verified_at: new Date()
         });
 
-        console.log(`[SUCCESS] Created Pending Link: ID ${newLink.id}`);
+        console.log(`[SUCCESS] Created Direct Active Link: ID ${newLink.id}`);
         res.json({
-            message: "Family link request sent. Awaiting verification.",
+            message: "Family member connected successfully.",
             link_id: newLink.id
         });
     } catch (err) {
