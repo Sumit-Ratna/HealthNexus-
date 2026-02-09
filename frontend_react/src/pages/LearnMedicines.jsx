@@ -25,7 +25,7 @@ const LearnMedicines = () => {
 
         try {
             // We reuse the same endpoint but pass a generic context since there is no report
-            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/ai/explainer`, {
+            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/ai/explainer`, {
                 medicine_name: searchTerm,
                 patient_id: user?.id || 'guest',
                 report_context: JSON.stringify({

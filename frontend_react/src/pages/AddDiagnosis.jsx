@@ -29,7 +29,7 @@ const AddDiagnosis = () => {
 
     const fetchPatient = async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/doctor/patients/${patientId}/history`);
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/doctor/patients/${patientId}/history`);
             setPatient(res.data.patient);
         } catch (err) {
             console.error('Error fetching patient:', err);
@@ -44,7 +44,7 @@ const AddDiagnosis = () => {
 
         setLoading(true);
         try {
-            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/doctor/diagnosis`, {
+            await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/doctor/diagnosis`, {
                 patient_id: patientId,
                 diagnosis,
                 symptoms,

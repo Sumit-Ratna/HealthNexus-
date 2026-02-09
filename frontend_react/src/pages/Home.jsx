@@ -21,7 +21,7 @@ const Home = () => {
     const fetchConnectedDoctors = async () => {
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/connect/patient/doctors`, {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/connect/patient/doctors`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setDoctors(res.data);
@@ -35,7 +35,7 @@ const Home = () => {
     const fetchAppointments = async () => {
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/connect/patient/appointments`, {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/connect/patient/appointments`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setAppointments(res.data);

@@ -27,7 +27,7 @@ const ProfileSetup = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/profile/update`, {
+            await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/profile/update`, {
                 section: 'personal',
                 data: formData
             });

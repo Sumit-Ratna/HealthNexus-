@@ -28,7 +28,7 @@ const FamilyHealth = () => {
     const fetchFamilyMembers = async () => {
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/family/list`, {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/family/list`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMembers(res.data);
@@ -69,7 +69,7 @@ const FamilyHealth = () => {
         try {
             // 1. Tell backend to prepare the link (and check if user exists)
             const token = localStorage.getItem('accessToken');
-            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/family/add`, {
+            await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/family/add`, {
                 phone: newMemberPhone,
                 relation: relation
             }, {
@@ -136,7 +136,7 @@ const FamilyHealth = () => {
 
             // 2. Send Token to Backend to finalize link
             const token = localStorage.getItem('accessToken');
-            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/family/verify`, {
+            await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/family/verify`, {
                 phone: newMemberPhone,
                 firebaseToken: idToken
             }, {
@@ -174,7 +174,7 @@ const FamilyHealth = () => {
         if (!window.confirm("Are you sure you want to remove this family member?")) return;
         try {
             const token = localStorage.getItem('accessToken');
-            await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/family/${memberId}`, {
+            await axios.delete(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/family/${memberId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchFamilyMembers();

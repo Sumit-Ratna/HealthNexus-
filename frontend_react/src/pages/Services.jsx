@@ -31,7 +31,7 @@ const Services = () => {
         setSafetyAnalysis(null);
         setError('');
         try {
-            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/ai/safety-check`, {
+            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/ai/safety-check`, {
                 newMed: medication,
                 patientHistory
             });
@@ -47,7 +47,7 @@ const Services = () => {
     const handleBookOpd = async () => {
         setBooking(true);
         try {
-            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/appointments/book/opd`, {
+            await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/appointments/book/opd`, {
                 symptoms: "General Checkup",
                 notes: "Self-booked via App"
             });

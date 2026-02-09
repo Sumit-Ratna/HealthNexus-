@@ -39,7 +39,7 @@ const PatientHistory = () => {
                 food_preference: editFormData.diet
             };
 
-            await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/doctor/patients/${patient_id}/profile`,
+            await axios.put(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/doctor/patients/${patient_id}/profile`,
                 { medical_history, lifestyle },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -75,7 +75,7 @@ const PatientHistory = () => {
 
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/documents/upload`, formData, {
+            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/documents/upload`, formData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'
@@ -112,7 +112,7 @@ const PatientHistory = () => {
     const fetchPatientHistory = async () => {
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/connect/doctor/patient/${patient_id}`, {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/connect/doctor/patient/${patient_id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             console.log("📄 Patient History Data:", res.data);
@@ -129,7 +129,7 @@ const PatientHistory = () => {
         if (window.confirm("Are you sure? This will remove the record from your portal. (Note: Only records you created will be permanently deleted; patient-shared reports will simply be unshared).")) {
             try {
                 const token = localStorage.getItem('accessToken');
-                const res = await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/documents/${docId}`, {
+                const res = await axios.delete(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/documents/${docId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 fetchPatientHistory(); // Refresh
@@ -151,7 +151,7 @@ const PatientHistory = () => {
 
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/documents/${docId}/analyze`, {}, {
+            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/documents/${docId}/analyze`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             alert("Analysis Complete!");
@@ -379,7 +379,7 @@ const PatientHistory = () => {
                                     <div style={{ display: 'flex', gap: '8px' }}>
                                         {doc.file_url && (
                                             <button
-                                                onClick={() => window.open(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/${doc.file_url}`, '_blank')}
+                                                onClick={() => window.open(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/${doc.file_url}`, '_blank')}
                                                 style={{
                                                     padding: '6px 12px',
                                                     borderRadius: '8px',

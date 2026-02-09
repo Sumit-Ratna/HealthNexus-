@@ -14,7 +14,7 @@ const CareTeam = () => {
     const fetchConnectedDoctors = async () => {
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/connect/patient/doctors`, {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/connect/patient/doctors`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setDoctors(res.data);
@@ -41,7 +41,7 @@ const CareTeam = () => {
         setChecking(true);
         setSafetyAnalysis(null);
         try {
-            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/ai/safety-check`, {
+            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/ai/safety-check`, {
                 newMed: medication,
                 patientHistory
             });

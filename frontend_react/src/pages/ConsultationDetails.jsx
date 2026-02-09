@@ -22,7 +22,7 @@ const ConsultationDetails = () => {
     const fetchConsultationDocs = async () => {
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/documents/patient/${user.id}`, {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/documents/patient/${user.id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -57,7 +57,7 @@ const ConsultationDetails = () => {
         if (window.confirm("Are you sure you want to remove this record from your history?")) {
             try {
                 const token = localStorage.getItem('accessToken');
-                await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/documents/${docId}`, {
+                await axios.delete(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/documents/${docId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 // Refresh local list

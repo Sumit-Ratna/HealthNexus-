@@ -45,7 +45,7 @@ const Records = ({ viewingPatientId }) => {
     const fetchConnectedDoctors = async () => {
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/connect/patient/doctors`, {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/connect/patient/doctors`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setConnectedDoctors(res.data);
@@ -57,7 +57,7 @@ const Records = ({ viewingPatientId }) => {
     const fetchDocuments = async () => {
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/documents/patient/${targetUserId}`, {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/documents/patient/${targetUserId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setDocuments(res.data);
@@ -104,7 +104,7 @@ const Records = ({ viewingPatientId }) => {
 
         try {
             console.log(`Uploading file ${shouldAnalyze ? '(with analysis)' : ''}...`, file.name);
-            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/documents/upload`, formData, {
+            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/documents/upload`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
@@ -131,7 +131,7 @@ const Records = ({ viewingPatientId }) => {
 
     const handleShareUpdate = async (docId, doctorIds) => {
         try {
-            await axios.patch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/documents/${docId}/share`, {
+            await axios.patch(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/documents/${docId}/share`, {
                 doctor_ids: doctorIds
             }, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
@@ -151,7 +151,7 @@ const Records = ({ viewingPatientId }) => {
 
         if (window.confirm(warning)) {
             try {
-                await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/documents/${docId}`, {
+                await axios.delete(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/documents/${docId}`, {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
                 });
                 fetchDocuments(); // Refresh list
@@ -167,7 +167,7 @@ const Records = ({ viewingPatientId }) => {
         setUploading(true); // Reuse uploading state to show loading spinner
         try {
             console.log("Requesting AI analysis for doc:", docId);
-            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/documents/${docId}/analyze`, {}, {
+            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/documents/${docId}/analyze`, {}, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
             });
             console.log("Analysis result:", res.data);
@@ -202,7 +202,7 @@ const Records = ({ viewingPatientId }) => {
                 }
             }
 
-            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/ai/explainer`, {
+            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/ai/explainer`, {
                 medicine_name: medicine,
                 patient_id: targetUserId,
                 report_context: JSON.stringify(contextData || {})
@@ -622,7 +622,7 @@ const Records = ({ viewingPatientId }) => {
                             }}>
                                 <div style={{ display: 'flex', gap: '8px' }}>
                                     <button
-                                        onClick={() => window.open(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/${doc.file_url}`, '_blank')}
+                                        onClick={() => window.open(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/${doc.file_url}`, '_blank')}
                                         disabled={!doc.file_url}
                                         style={{
                                             padding: '6px 14px',
