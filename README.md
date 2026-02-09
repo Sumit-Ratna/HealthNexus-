@@ -57,3 +57,14 @@ npm run dev
 ```
 
 The application will be available at [http://localhost:3003](http://localhost:3003).
+
+## Credits
+
+This project was developed and maintained with contributions from the following individuals:
+
+- **Sumit Kumar Ratna**
+- **Aditya Singh**
+- **Anshika Thakur**
+- **Vishnukant Bajpai**
+
+We acknowledge and appreciate the efforts, ideas, and collaboration of all contributors involved in this project.
