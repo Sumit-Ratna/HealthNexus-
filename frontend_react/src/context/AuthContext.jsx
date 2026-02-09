@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
 
     const fetchUser = async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/auth/me`);
+            const res = await axios.get(`https://healthnexus-c3sa.onrender.com/api/auth/me`);
             setUser(res.data);
         } catch (err) {
             console.error("Auth Check Failed", err);
@@ -52,8 +52,8 @@ export const AuthProvider = ({ children }) => {
 
     const sendOtp = async (phone) => {
         try {
-            // 1. Check User Status with Backend
-            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/auth/otp/send`, { phone });
+            // 1. Check User Status with Backend - Hardcoded URL for reliability
+            const res = await axios.post(`https://healthnexus-c3sa.onrender.com/api/auth/otp/send`, { phone });
             const { isNew } = res.data;
 
             console.log(`[DEV] Fixed OTP Mode. User exists: ${!isNew}`);
@@ -70,8 +70,8 @@ export const AuthProvider = ({ children }) => {
     const verifyOtp = async (confirmationResult_ignored, otp, phone, expectedRole = 'patient') => {
         // 1. Skip Firebase Verification
 
-        // 2. Login with Backend using Fixed OTP
-        const res = await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/auth/otp/verify`, {
+        // 2. Login with Backend using Fixed OTP - Hardcoded URL for reliability
+        const res = await axios.post(`https://healthnexus-c3sa.onrender.com/api/auth/otp/verify`, {
             phone,
             otp, // Sending OTP instead of firebaseToken
             role: expectedRole
@@ -89,7 +89,8 @@ export const AuthProvider = ({ children }) => {
     const register = async (userData, firebaseToken_ignored) => {
         // userData: { phone, role, name, etc. }
         // We inject otp '123456' to bypass backend check
-        const res = await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/auth/register`, {
+        // hardcoded URL for reliability
+        const res = await axios.post(`https://healthnexus-c3sa.onrender.com/api/auth/register`, {
             ...userData,
             otp: '123456'
         });

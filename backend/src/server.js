@@ -35,7 +35,7 @@ app.use('/api/documents', documentRoutes);
 app.use('/api/doctor', doctorRoutes);
 
 app.get('/', (req, res) => {
-    res.send('HealthNexus API is Running with Firebase');
+    res.send('HealthNexus API is Running (DEPLOYED: FIXED OTP MODE)');
 });
 
 // Start Server with Firestore Check
