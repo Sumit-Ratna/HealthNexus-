@@ -31,7 +31,7 @@ const PrescribeMedicine = () => {
 
     const fetchPatient = async () => {
         try {
-            const res = await axios.get(`http://localhost:8000/api/doctor/patients/${patientId}/history`);
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/doctor/patients/${patientId}/history`);
             setPatient(res.data.patient);
         } catch (err) {
             console.error('Error fetching patient:', err);
@@ -62,7 +62,7 @@ const PrescribeMedicine = () => {
         try {
             const medicineNames = medicines.map(m => `${m.name} ${m.dosage} ${m.frequency} for ${m.duration}`);
 
-            const res = await axios.post('http://localhost:8000/api/doctor/prescribe', {
+            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/doctor/prescribe`, {
                 patient_id: patientId,
                 medicines: medicineNames,
                 diagnosis,

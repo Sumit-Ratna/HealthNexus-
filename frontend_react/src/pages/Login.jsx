@@ -22,10 +22,32 @@ const Login = () => {
             setStep(2);
         } catch (err) {
             console.error("Full Login Error:", err);
-            const errorMessage = err.code ? `Firebase: ${err.code}` : err.message;
-            alert("Failed to send OTP: " + errorMessage);
+            let errorMessage = "An error occurred";
 
-            // cleanup is now handled in setupRecaptcha
+            if (err.isAxiosError) {
+                errorMessage = "Network Error: Cannot connect to backend server. Make sure the backend is running and accessible.";
+            } else if (err.code) {
+                switch (err.code) {
+                    case 'auth/network-request-failed':
+                        errorMessage = "Firebase Network Error: Check your internet connection or if the domain is authorized in Firebase Console.";
+                        break;
+                    case 'auth/invalid-phone-number':
+                        errorMessage = "Invalid phone number format.";
+                        break;
+                    case 'auth/quota-exceeded':
+                        errorMessage = "SMS quota exceeded for this project.";
+                        break;
+                    case 'auth/missing-app-credential':
+                        errorMessage = "Missing app credential (reCAPTCHA) token.";
+                        break;
+                    default:
+                        errorMessage = `Firebase Error: ${err.code}`;
+                }
+            } else {
+                errorMessage = err.message;
+            }
+
+            alert("Failed to send OTP: " + errorMessage);
         }
     };
 

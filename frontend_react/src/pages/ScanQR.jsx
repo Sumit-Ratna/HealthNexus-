@@ -17,7 +17,7 @@ const ScanQR = () => {
         setMessage('');
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await axios.get(`http://localhost:8000/api/connect/doctor/qr/${manualId}`, {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/connect/doctor/qr/${manualId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setDoctorData(res.data);
@@ -43,7 +43,7 @@ const ScanQR = () => {
         setStatus('connecting');
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await axios.post('http://localhost:8000/api/connect/doctor/link',
+            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/connect/doctor/link`,
                 { doctor_qr_id: doctorData.doctor_qr_id },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
 
     const fetchUser = async () => {
         try {
-            const res = await axios.get('http://localhost:8000/api/auth/me');
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/auth/me`);
             setUser(res.data);
         } catch (err) {
             console.error("Auth Check Failed", err);
@@ -60,10 +60,10 @@ export const AuthProvider = ({ children }) => {
         }
 
         // 2. Clear visual DOM artifacts (Simpler, safer approach)
-        const container = document.getElementById(elementId);
-        if (container) {
-            container.innerHTML = '';
-        }
+        //->      // const container = document.getElementById(elementId);
+        // if (container) {
+        //     container.innerHTML = '';
+        // }
 
         // 3. Init new verifier
         try {
@@ -77,7 +77,8 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const sendOtp = async (phone, recaptchaContainerId = 'recaptcha-container') => {
+    //->    // const sendOtp = async (phone, recaptchaContainerId = 'recaptcha-container') => {
+    const sendOtp = async (phone, recaptchaContainerId = 'recaptcha-login') => {
         try {
             // 1. Initialize Recaptcha FIRST (Fixes "black screen" or race condition)
             setupRecaptcha(recaptchaContainerId);
@@ -87,12 +88,12 @@ export const AuthProvider = ({ children }) => {
                 throw new Error("Recaptcha verification failed to initialize. Please refresh.");
             }
 
-            // Explicitly wait for render (catch render errors early)
-            const widgetId = await appVerifier.render();
-            console.log(`✅ Recaptcha rendered successfully. Widget ID: ${widgetId}`);
+            //->        // Explicitly wait for render (catch render errors early)
+            // const widgetId = await appVerifier.render();
+            // console.log(`✅ Recaptcha rendered successfully. Widget ID: ${widgetId}`);
 
             // 2. Check User Status with Backend
-            const res = await axios.post('http://localhost:8000/api/auth/otp/send', { phone });
+            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/auth/otp/send`, { phone });
             const { isNew } = res.data;
 
             // 3. Send Firebase OTP
@@ -119,7 +120,7 @@ export const AuthProvider = ({ children }) => {
         console.log("🔥 Firebase Auth Success. Token:", idToken);
 
         // 2. Login with Backend using Token
-        const res = await axios.post('http://localhost:8000/api/auth/otp/verify', {
+        const res = await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/auth/otp/verify`, {
             phone,
             firebaseToken: idToken,
             role: expectedRole
@@ -136,7 +137,7 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (userData, firebaseToken) => {
         // userData: { phone, role, name, etc. }
-        const res = await axios.post('http://localhost:8000/api/auth/register', {
+        const res = await axios.post(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/auth/register`, {
             ...userData,
             firebaseToken
         });
@@ -150,7 +151,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const deleteAccount = async () => {
-        await axios.delete('http://localhost:8000/api/profile/delete');
+        await axios.delete(`${import.meta.env.VITE_API_URL || 'https://healthnexus-c3sa.onrender.com'}/api/profile/delete`);
         logout();
     };
 

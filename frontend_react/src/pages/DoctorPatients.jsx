@@ -23,7 +23,7 @@ const DoctorPatients = () => {
     const fetchPatients = async () => {
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await axios.get('http://localhost:8000/api/connect/doctor/patients', {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/connect/doctor/patients`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setPatients(res.data);

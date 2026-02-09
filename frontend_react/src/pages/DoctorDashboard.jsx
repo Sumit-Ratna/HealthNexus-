@@ -22,10 +22,10 @@ const DoctorDashboard = () => {
 
     const fetchData = async () => {
         try {
-            const statsRes = await axios.get('http://localhost:8000/api/doctor/dashboard');
+            const statsRes = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/doctor/dashboard`);
             setStats(statsRes.data);
 
-            const patientsRes = await axios.get('http://localhost:8000/api/doctor/patients');
+            const patientsRes = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/doctor/patients`);
             setPatients(patientsRes.data);
         } catch (err) {
             console.error('Error fetching doctor data:', err);

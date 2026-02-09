@@ -12,7 +12,7 @@ const Status = () => {
 
     const fetchAppointments = async () => {
         try {
-            const res = await axios.get('http://localhost:8000/api/appointments/my-list');
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/appointments/my-list`);
             setAppointments(res.data);
         } catch (err) {
             console.log("No appointments yet or auth error");
